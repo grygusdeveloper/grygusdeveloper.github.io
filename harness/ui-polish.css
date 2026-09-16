@@ -1,0 +1,153 @@
+/* Native scrolling polish. No fake scrollbar, canvas, or wheel interception. */
+:root {
+  --scroll-track: #0a1121;
+  --scroll-thumb: #596b90;
+  --scroll-thumb-hover: #8b88bc;
+  --scroll-thumb-active: #b09ced;
+}
+
+html {
+  scrollbar-gutter: stable;
+  scroll-padding-block: 76px 24px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
+.sidebar {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-padding-block: 16px;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: 12px;
+}
+
+.table-scroll:focus-visible {
+  outline: 2px solid #a28bdb;
+  outline-offset: -3px;
+}
+
+dialog {
+  overscroll-behavior: contain;
+  scroll-padding-block: 16px;
+}
+
+/* Keep the background still while a modal is open. The stable root gutter
+   reserves the same space before/after locking; no horizontal layout jump. */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+.command-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.command-search, .command-footer {
+  flex-shrink: 0;
+}
+
+.command-results {
+  min-height: 0;
+  overscroll-behavior-y: contain;
+}
+
+@media (hover: hover) {
+  .sidebar:hover, .table-scroll:hover, .command-results:hover, dialog:hover {
+    scrollbar-color: var(--scroll-thumb-hover) var(--scroll-track);
+  }
+}
+
+/* Chromium / Edge / WebKit. Reset the standards properties here because
+   non-auto values take precedence over the pseudo-element skin. Firefox
+   retains the standards-based thin, dark scrollbar declared above. */
+@supports selector(::-webkit-scrollbar) {
+  @media (forced-colors: none) {
+    *, .sidebar, .sidebar:hover, .table-scroll:hover,
+    .command-results:hover, dialog:hover {
+      scrollbar-width: auto;
+      scrollbar-color: auto;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--scroll-track);
+      border-radius: 12px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      min-height: 36px;
+      min-width: 36px;
+      background: var(--scroll-thumb);
+      background-clip: padding-box;
+      border: 2px solid transparent;
+      border-radius: 12px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: var(--scroll-thumb-hover);
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+      background-color: var(--scroll-thumb-active);
+    }
+
+    ::-webkit-scrollbar-corner {
+      background: var(--scroll-track);
+    }
+
+    ::-webkit-scrollbar-button {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+  }
+}
+
+/* A short desktop should not grow a second scrollbar merely to display the
+   decorative sidebar card. Keep navigation and operational status visible. */
+@media (min-width: 1051px) and (max-height: 980px) {
+  .sidebar { padding-top: 14px; padding-bottom: 10px; }
+  .brand { margin-bottom: 18px; flex-shrink: 0; }
+  .sidebar nav { flex-shrink: 0; }
+  .nav-link { height: 40px; margin-bottom: 3px; }
+  .sidebar-space { min-height: 12px; }
+  .system-summary { padding: 12px 10px; margin-bottom: 14px; flex-shrink: 0; }
+  .manifesto { min-height: 220px; height: clamp(220px, 25vh, 260px); }
+  .manifesto-copy { bottom: 12px; }
+  .manifesto h2 { font-size: 19px; }
+  .manifesto p { font-size: 10px; margin-top: 9px; }
+  .manifesto .small-rule { margin: 10px 0 8px; }
+  .demo-caption { flex-shrink: 0; }
+}
+
+@media (min-width: 1051px) and (max-height: 820px) {
+  .manifesto { display: none; }
+}
+
+/* Wider native affordances on touch devices and in high-contrast mode. */
+@media (pointer: coarse) {
+  * { scrollbar-width: auto; }
+  ::-webkit-scrollbar { width: 14px; height: 14px; }
+}
+
+@media (forced-colors: active) {
+  *, .sidebar, .sidebar:hover, .table-scroll:hover,
+  .command-results:hover, dialog:hover {
+    scrollbar-color: auto;
+    scrollbar-width: auto;
+  }
+  .table-scroll:focus-visible { outline-color: Highlight; }
+}
